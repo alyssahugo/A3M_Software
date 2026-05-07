@@ -23,6 +23,7 @@
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 `timescale 1ns / 1ps
+`include "config.vh"
 module divider_unit(
 	input CLK,
 	input nrst,
@@ -97,6 +98,10 @@ module divider_unit(
 	wire div_signed_overflow = (opA == 32'h0x8000000) && (opB == 32'hFFFFFFFF);	// -2^31/-1 causes an overflow
 	wire div_normal_case = !(div_by_zero || div_signed_overflow);
 
+//	wire div_by_zero = (opB == 32'b0);		// division by zero
+//	wire div_signed_overflow = (opA == 32'h0x8000000) && (opB == 32'hFFFFFFFF);	// -2^31 / -1 causes overflow
+//	wire div_normal_case = !(div_by_zero || div_signed_overflow);
+
 	// Assigning tvalid inputs
 	// assert tvalid for one divider module only (depending if the operation is signed/unsigned)	
 	// Note: the tvalid inputs are ANDed w/ div_state == WAIT because
@@ -104,12 +109,14 @@ module divider_unit(
 	// (put another way, we want them to be asserted by the next cycle (starting at state DIVIDING))
 	assign div_signed_input_tvalid = exe_div_valid & ~exe_div_op[0] & (div_state == WAIT) & ~load_hazard;
 	assign div_unsigned_input_tvalid = exe_div_valid & exe_div_op[0] & (div_state == WAIT) & ~load_hazard;
-
+//	assign div_signed_input_tvalid   = exe_div_valid & ~exe_div_op[0] & (div_state == WAIT) & ~load_hazard;
+//	assign div_unsigned_input_tvalid = exe_div_valid &  exe_div_op[0] & (div_state == WAIT) & ~load_hazard;
 	// Instantiating Divider generator modules
 	// NOTE: aresetn should be active for at least 2 cycles.
 	wire divrem_clken = (~id_div_op_0 & id_div_valid) | (~exe_div_op[0] & exe_div_valid);
 	wire divuremu_clken = (id_div_op_0 & id_div_valid) | (exe_div_op[0] & exe_div_valid);
-	
+//	wire divrem_clken   = 1'b1;
+//	wire divuremu_clken = 1'b1;	
 
     div_gen_signed DIVREM(
         .aclk(CLK),

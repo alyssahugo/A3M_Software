@@ -2,7 +2,7 @@
 `define CONFIG_VH
 
 `define FEATURE_MULT
-// `define FEATURE_DIV
+`define FEATURE_DIV
 // `define FEATURE_XILINX_DATAMEM_IP_GEN
 // `define FEATURE_XILINX_BUFFER_IP
 

@@ -539,7 +539,7 @@ module ATOMIC_MODULE
 
                     // Clear captured read data only when starting a NEW transaction.
                     if (i_is_atomic || i_rd || i_wr) begin
-                        temp_t  <= 32'h0000_0000;
+//                        temp_t  <= 32'h0000_0000;
                         state   <= S_WAIT;
                         r_stall <= 1'b1;
                     end else begin

@@ -188,7 +188,7 @@
 
 module new_data_bootloader
 #(
-    parameter integer WORDS_TO_COPY   = 84624,
+    parameter integer WORDS_TO_COPY   = 86176,
     parameter [31:0] DDR_BASE_ADDRESS = 32'h8000_0000,
     parameter integer BRAM_ADDR_WIDTH = 17,
     parameter integer BURST_WORDS     = 32
