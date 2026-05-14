@@ -1,111 +1,139 @@
-This contains the processor Files from the [CIDR RIV32IMC Project](https://gitlab.eee.upd.edu.ph/cidr-p3-public/pipelined-RV32IMC/-/tree/master?ref_type=heads), with modifications from Hora et al.
+# RV32IMC Processor Core Vivado Setup
 
-# Files to Download
+This repository contains the processor files from the [CIDR RV32IMC Project](https://gitlab.eee.upd.edu.ph/cidr-p3-public/pipelined-RV32IMC/-/tree/master?ref_type=heads), with modifications from Hora et al.
 
-1.  [[Second_import_files]{.underline}](https://drive.google.com/drive/folders/1OLKL3d8LRpCeD8sCe7np8FxyHxcBp54E?usp=drive_link)
+## Files to Download
 
-2.  [**[[NEW! second_import_files]{.underline}]{.mark}**](https://drive.google.com/drive/folders/1VVjZdFEsaMmFBCsvrEgEZ5Bqd3OeqhHY?usp=sharing)
+Download the following folders/files before creating the Vivado project:
 
-3.  [[MIG_7]{.underline}](https://drive.google.com/drive/folders/1m5bgVZMtVzj3Vllg9JPMsSTLAW96qnyu?usp=sharing) - put this in the same folder as second_import_files
+1. [second_import_files](https://drive.google.com/drive/folders/1OLKL3d8LRpCeD8sCe7np8FxyHxcBp54E?usp=drive_link)
+2. [NEW second_import_files](https://drive.google.com/drive/folders/1VVjZdFEsaMmFBCsvrEgEZ5Bqd3OeqhHY?usp=sharing)
+3. [MIG_7](https://drive.google.com/drive/folders/1m5bgVZMtVzj3Vllg9JPMsSTLAW96qnyu?usp=sharing)  
+   Place this in the same folder as `second_import_files`.
+4. [Nexys Video board files](https://drive.google.com/drive/folders/1OLKL3d8LRpCeD8sCe7np8FxyHxcBp54E?usp=drive_link)  
+   Copy these to:
 
-4.  [[Nexys Video board files]{.underline}](https://drive.google.com/drive/folders/1OLKL3d8LRpCeD8sCe7np8FxyHxcBp54E?usp=drive_link)
+   ```text
+   D:\Xilinx\Vivado\2024.1\data\boards\board_files
+   ```
 
-    a.  D:\Xilinx\Vivado\2024.1\data\boards\board_files
+5. [Datamem and Instmem COE files](https://drive.google.com/drive/folders/1OLKL3d8LRpCeD8sCe7np8FxyHxcBp54E?usp=sharing)
+6. [MCS Folder](https://drive.google.com/drive/folders/1jLJ0glUKPrnkScBCat9Iahh-sUfTC03I?usp=sharing)
 
-5.  [[Datamem and Instmem COE files]{.underline}](https://drive.google.com/drive/folders/1OLKL3d8LRpCeD8sCe7np8FxyHxcBp54E?usp=sharing)
+## Importing the Processor Core
 
-6.  [**[[MCS Folder]{.underline}]{.mark}**](https://drive.google.com/drive/folders/1jLJ0glUKPrnkScBCat9Iahh-sUfTC03I?usp=sharing)
+1. Open Vivado.
+2. Create a new project.
+3. Click **Next** until you reach the **Boards** tab.
+4. Select **Nexys Video**.
+5. Open `project_run.tcl` in Notepad or another text editor.
+6. Change the source directory to the location of your downloaded `second_import_files` folder.
+7. In Vivado, go to **Tools > Run Tcl Script**, then select `project_run.tcl`.
 
-# Importing the Processor Core
+   Checkpoint: after running the script, there should be around **47 files** in **Design Sources**.
 
-1.  Open Vivado.
+   > Note: The folder contains three new Verilog files for QSPI. The Block Design Tcl already includes the DMA controller and CSR modules, so make sure those modules are also present in your Design Sources. If `second_import_files` does not include the DMA controller and CSR Verilog files, add them manually alongside the other processor files.
 
-2.  Create a New Project.
+8. In the **Sources** pane, right-click the constraint folder:
 
-3.  Click Next until you go to the Boards tab. Click and Select Nexys Video.
+   ```text
+   Constraints > a7_200t
+   ```
 
-4.  Open the project_run.tcl file in Notepad.  
-    > ![](media/image2.png){width="5.859375546806649in" height="0.5258409886264217in"}
+   Then select **Make Active**.
 
-5.  Change the source directory to where the second_import_files folder is located (or where you downloaded it).
+9. Open `uart_bd.tcl`.
+10. Search for `datamem_run` and `instmem_run`.
+11. Replace the paths with the local paths to your own `datamem_run.coe` and `instmem_run.coe` files.
+12. In Vivado, go to **Tools > Run Tcl Script**, then run:
 
-6.  Go to the top right of Vivado, click Tools \> Run tcl script \> project_run.tcl file. (Checkpoint: 47 files in the Design Sources) **EDIT:** This folder contains three new verilog files for the QSPI. **AND the Block Design TCL already includes the DMA controller and CSR modules**, so **make sure** that those modules are also in your Design Sources. So, aside from importing the second_import_files, also upload the dma controller and csr verilog files alongside it. Because the second_import_files folder does not have the verilog files for that.
+   ```text
+   uart_bd_with_qspi.tcl
+   ```
 
-7.  Right click on the Constraints \> a7_200t folder \> Make Active
+   This should build the block design. As long as all required modules are present in the processor folder inside `second_import_files`, the block design should build successfully.
 
-8.  Open uart_bd.tcl. Search for datamem_run and instmem_run. Replace the directory where datamem_run.coe and instmem_run.coe is in your own files.
+## Generating the Divider IPs
 
-> ![](media/image6.png){width="5.828125546806649in" height="1.3823118985126859in"}
+Vivado requires two Divider Generator IPs:
 
-9.  Go to the top right of Vivado and click Tools \> Run Tcl script \> uart_bd_with_qspi.tcl. It should build the block design. You should now see the block design being built. As long as the modules are all present in the processor folder inside the second_import_files, it should be okay, and the block design must be built successfully.
+- `div_gen_signed`
+- `div_gen_unsigned`
 
-# For generating Divider IP, follow these instructions through the images. {#for-generating-divider-ip-follow-these-instructions-through-the-images.}
+Follow these steps for each Divider Generator IP:
 
-1.  Click IP Catalog on the left project manager.
+1. In the left **Project Manager** panel, click **IP Catalog**.
+2. Search for **Divider Generator**.
+3. Open it and click **Customize IP**.
+4. Name the IP either:
 
-2.  Search for Divider Generator, click on it.
+   ```text
+   div_gen_signed
+   ```
 
-3.  Click Customize IP.
+   or:
 
-4.  Make sure to name it div_gen_signed and div_gen_unsigned.
+   ```text
+   div_gen_unsigned
+   ```
 
-5.  Apply the settings on the picture.
+5. Apply the settings shown in the reference images from the original setup guide.
+6. Generate the output products for each IP.
 
-![](media/image8.png){width="6.5in" height="2.7222222222222223in"}
+## Generating the Bitstream
 
-![](media/image11.png){width="2.2375339020122484in" height="1.4504615048118985in"}
+1. Make sure all modified Verilog modules are saved.
+2. If you made changes to IPs, click **Report IP Status**.
+3. Select **Upgrade Selected** if Vivado reports outdated IPs.
+4. Generate output products for the upgraded IPs. Select **Global**.
+5. After all IPs are updated, right-click the block design and select **Validate Design**.
+6. Save the block design with **Ctrl + S**.
+7. In the **Sources** pane, click **IP Sources**.
+8. Right-click `uart_bd`.
+9. Select **Reset Output Products**.
+10. Right-click `uart_bd` again.
+11. Select **Create HDL Wrapper**.
+12. Ignore warnings if they only say that some pins are not connected.
+13. Right-click `uart_bd` again.
+14. Select **Generate Output Products**.
+15. Choose **Global**.
+16. Click **Generate Bitstream**.
 
-![](media/image7.png){width="4.098958880139983in" height="1.2991229221347331in"}
+## Programming and Running on the Board
 
-![](media/image5.png){width="5.859375546806649in" height="4.306990376202974in"}![](media/image1.png){width="5.380208880139983in" height="3.9413156167979in"}![](media/image4.png){width="4.4396281714785655in" height="1.9010422134733158in"}
+1. After generating the bitstream, click **Open Hardware Manager** in the Flow Navigator.
+2. Click **Auto Connect** when searching for a target.
+3. The Nexys Video board should appear.
+4. When Vivado shows **Add Configuration Memory Device**, click it.
+5. In the search bar, search for:
 
-# Generating Bitstream Steps:
+   ```text
+   s25fl256sxxxxxx0-spi-x1_x2_x4
+   ```
 
-1.  Make sure all modified verilog modules are saved. If you made changes, click Report IP Status and select Upgrade Selected. Also, Generate Output Products of the new upgraded IP. Select Global.
+6. Select the device.
+7. When Vivado asks whether you want to program the memory configuration device now, click **OK**.
+8. In the programming window, load the `.mcs` file by clicking the ellipsis button.
+9. Make sure the required programming options are checked.
+10. Click **Apply**, then click **OK**.
+11. Vivado should print blue command messages in the Tcl console after clicking **Apply** and **OK**.
+12. If there are no errors, Vivado will proceed through the programming and verification steps.
 
-2.  After all IPs are updated, right click on the Block Design and select Validate Design.
+## UART / PuTTY Setup
 
-3.  After validating, Ctrl + S to save block design.
+Open the serial terminal before or during configuration memory programming.
 
-4.  On the Sources pane, click on IP sources.  
-    > ![](media/image9.png){width="3.1458333333333335in" height="2.3645833333333335in"}
+After setting up PuTTY or another UART terminal, return to Vivado and continue with the next step.
 
-5.  Right-click on uart_bd. Select Reset Output Products.
+## Programming the FPGA Device
 
-6.  Then right-click again. Select Create HDL Wrapper.
+1. In the green task area at the top of Vivado, click **Program Device**.
+2. Vivado should show the generated bitstream and the `.ltx` debug ILA file.
+3. Make sure the selected bitstream is the correct one.
+4. Click **Program**.
+5. At first, nothing may print on the serial terminal. This is expected while the QSPI bootloader is active.
+6. After around 10 to 15 seconds, UART output should appear, depending on the program currently loaded.
 
-7.  Ignore all the warnings if it just says some pins are not connected.
+## Remarks
 
-8.  Right-click, Select Generate Output Products: Global.
-
-9.  Then you may select Generate Bitstream.
-
-#   {#section}
-
-# [Running:]{.mark}
-
-1.  After generating bistream, click "Open Hardware Manager" in the Flow Navigator.
-
-2.  Click Auto Connect when finding a new target.
-
-3.  The board will appear.
-
-4.  You will also see Add Configuration Memory Device. Click that. Then on the search bar, search: **s25fl256sxxxxxx0-spi-x1_x2_x4**
-
-> ![](media/image3.png){width="2.6666666666666665in" height="1.375in"}
-
-5.  Click on it and it will ask you Do You want to program memory configuration device now. Click OK. It will then show you a window that you will put the .MCS file in. I will send the MCS file. Click on the ellipsis button to load your file. Make sure these are checked:![](media/image10.png){width="3.0364588801399823in" height="4.2089523184601925in"}
-
-> Click Appy. Then Click OK.
-
-6.  You will see the blue command lines appearing on the console both after clicking Apply and OK. If there are no errors, it will proceed with the Programming and Verification steps. I think it was like 4 steps. It's just a dialogue box.
-
-7.  You should by now **redirect** to the [[UART PUTTY]{.underline}](?tab=t.0) steps. You must open the Serial terminal before or during Programming configuration memory device.
-
-8.  After the PUTTY terminal setup, proceed back here. On the green task area at the top, click on Program Device. It will show you the dialogue box that shows the bitstream and ltx debug ILA file, that is usually the file generated in the same project window you're in. Make sure it's the right bitstream, then click Program.
-
-9.  At first, there will be nothing printing on the serial terminal. That's the QSPI bootloading active time. After 10-15 seconds, something should print, depending on the program you're running.
-
-# Remarks
-
-- I am not completely sure if this will be successful without manually importing the MIG_7 IP in the block design instead of relying on the bd tcl. Please tell me asap if there are errors.
+I am not completely sure whether this setup will always work without manually importing the `MIG_7` IP into the block design instead of relying only on the BD Tcl script. If Vivado reports errors related to `MIG_7`, try importing the IP manually and rerunning the block design generation steps.
